@@ -1,1 +1,1 @@
-# Aplicación_inteligencia_economica
+# aplicación_inteligencia_economica
