@@ -1,21 +1,34 @@
 {
   "name": "aplicacion_inteligencia_economica",
-  "version": "1.0.0",
-  "description": "",
-  "homepage": "https://github.com/conhectorcl/Aplicacion_inteligencia_economica#readme",
-  "bugs": {
-    "url": "https://github.com/conhectorcl/Aplicacion_inteligencia_economica/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/conhectorcl/Aplicacion_inteligencia_economica.git"
-  },
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "index.js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "@supabase/supabase-js": "^2.103.3",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.8.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-is": "^19.2.5",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.4"
+  }
 }

@@ -10,7 +10,7 @@ import { ResponsiveContainer, LineChart as RLineChart, Line, XAxis, YAxis, Toolt
 import { motion } from 'framer-motion';
 
 const macroSeries = [
-  { mes: 'Ene', ipc: 0.0, tpm: 5.0, usd: 920 },
+  { mes: 'Ene', ipc: 0.7, tpm: 5.0, usd: 920 },
   { mes: 'Feb', ipc: 0.5, tpm: 5.25, usd: 938 },
   { mes: 'Mar', ipc: 0.6, tpm: 5.5, usd: 955 },
   { mes: 'Abr', ipc: 0.4, tpm: 5.5, usd: 948 },
@@ -95,19 +95,17 @@ function SeverityBadge({ severity }) {
   return <span className={`inline-flex rounded-full border px-2 py-1 text-xs font-medium ${map[severity] || 'bg-slate-100 text-slate-700 border-slate-200'}`}>{severity}</span>;
 }
 
-
 export default function ClarusUIPrototype() {
   const [sector, setSector] = useState('retail');
   const [query, setQuery] = useState('');
 
-  
   const filteredProducts = useMemo(() => {
     return pricingProducts.filter((item) =>
       item.producto.toLowerCase().includes(query.toLowerCase()) ||
       item.sku.toLowerCase().includes(query.toLowerCase())
     );
   }, [query]);
-  
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-7xl p-6 md:p-8">
@@ -234,16 +232,40 @@ export default function ClarusUIPrototype() {
                 <CardContent>
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
-                      <RLineChart data={macroSeries}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="mes" />
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip />
-                        <Line yAxisId="left" type="monotone" dataKey="ipc" strokeWidth={2} dot={false} />
-                        <Line yAxisId="left" type="monotone" dataKey="tpm" strokeWidth={2} dot={false} />
-                        <Line yAxisId="right" type="monotone" dataKey="usd" strokeWidth={2} dot={false} />
-                      </RLineChart>
+                     <RLineChart data={macroSeries}>
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis dataKey="mes" />
+  <YAxis yAxisId="left" />
+  <YAxis yAxisId="right" orientation="right" />
+  <Tooltip />
+
+  <Line
+    yAxisId="left"
+    type="monotone"
+    dataKey="ipc"
+    stroke="#2563eb"
+    strokeWidth={2}
+    dot={false}
+  />
+
+  <Line
+    yAxisId="left"
+    type="monotone"
+    dataKey="tpm"
+    stroke="#16a34a"
+    strokeWidth={2}
+    dot={false}
+  />
+
+  <Line
+    yAxisId="right"
+    type="monotone"
+    dataKey="usd"
+    stroke="#f59e0b"
+    strokeWidth={2}
+    dot={false}
+  />
+</RLineChart>
                     </ResponsiveContainer>
                   </div>
                 </CardContent>
@@ -402,4 +424,4 @@ export default function ClarusUIPrototype() {
       </div>
     </div>
   );
-  }
+}
