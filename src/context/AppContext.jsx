@@ -1,16 +1,27 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
 
-const AppContext = createContext();
+const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [sector, setSector] = useState('retail');
-  const [fechaCorte, setFechaCorte] = useState('2026-06');
+  const [filters, setFilters] = useState({
+    vertical: 'retail',
+    decisionFocus: 'pricing',
+    scenario: 'base',
+  });
 
-  return (
-    <AppContext.Provider value={{ sector, setSector, fechaCorte, setFechaCorte }}>
-      {children}
-    </AppContext.Provider>
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
+
+  const value = useMemo(
+    () => ({
+      filters,
+      setFilters,
+      selectedDate,
+      setSelectedDate,
+    }),
+    [filters, selectedDate]
   );
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
 export function useAppContext() {

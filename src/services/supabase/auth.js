@@ -1,9 +1,21 @@
 import { supabase } from './client';
 
-export async function signIn(email, password) {
-  return supabase.auth.signInWithPassword({ email, password });
+export async function signInWithPassword(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  return { data, error };
 }
 
 export async function signOut() {
-  return supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  return { error };
+}
+
+export async function getSession() {
+  const { data, error } = await supabase.auth.getSession();
+  return { data, error };
+}
+
+export async function getCurrentUser() {
+  const { data, error } = await supabase.auth.getUser();
+  return { data, error };
 }

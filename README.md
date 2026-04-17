@@ -1,16 +1,36 @@
-# React + Vite
+# CLARUS - Inteligencia Económica para Decisiones Empresariales
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+CLARUS es un prototipo funcional construido con React, JavaScript y Supabase para apoyar decisiones empresariales con foco en pricing, alertas económicas y reportería ejecutiva.
 
-Currently, two official plugins are available:
+## Objetivo del prototipo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Mostrar una experiencia realista de una plataforma que:
+- consulta indicadores económicos
+- evalúa impacto empresarial
+- recomienda ajustes de precio
+- genera alertas ejecutivas
+- prepara reportes exportables
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- JavaScript
+- Vite
+- Supabase
+- Edge Functions
+- SQL para tablas y seed
 
-## Expanding the ESLint configuration
+## Estructura
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `src/data`: datos mock para prototipo
+- `src/services`: acceso a datos y lógica de negocio
+- `src/hooks`: encapsula llamadas y estado
+- `src/context`: estado global de autenticación y negocio
+- `supabase/functions`: funciones edge
+- `supabase/migrations`: estructura de base de datos
+
+## Ejecutar local
+
+```bash
+npm install
+npm run dev

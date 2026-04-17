@@ -1,8 +1,12 @@
-export function parseIndicators(data = []) {
-    return data.map((item) => ({
-      mes: item.mes,
-      ipc: Number(item.ipc || 0),
-      tpm: Number(item.tpm || 0),
-      usd: Number(item.usd || 0),
-    }));
-  }
+export function parseIndicators(rawIndicators = []) {
+  return rawIndicators.map((item) => ({
+    codigo: item.codigo,
+    nombre: item.nombre,
+    valor: Number(item.valor),
+    variacionMensual: Number(item.variacionMensual || 0),
+    fecha: item.fecha,
+    unidad: item.unidad || '%',
+    moneda: item.moneda || 'CLP',
+    fuente: item.fuente || 'Banco Central / Mock',
+  }));
+}

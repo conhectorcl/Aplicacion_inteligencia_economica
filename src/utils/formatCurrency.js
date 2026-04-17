@@ -1,7 +1,9 @@
-export function formatCurrency(value) {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP',
-      maximumFractionDigits: 0,
-    }).format(value);
-  }
+export function formatCurrency(value = 0, currency = 'CLP') {
+  const locale = currency === 'USD' ? 'en-US' : 'es-CL';
+
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value);
+}

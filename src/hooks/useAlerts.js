@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
-import { getAlertas } from '../services/api/alertasService';
+import { getAlerts } from '../services/api/alertasService';
 
-export function useAlerts() {
-  const [data, setData] = useState([]);
+export function useAlerts(indicadores = []) {
+  const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
-    getAlertas().then(setData);
-  }, []);
+    async function load() {
+      const data = await getAlerts(indicadores);
+      setAlerts(data);
+    }
 
-  return { data };
+    if (indicadores.length) {
+      load();
+    }
+  }, [indicadores]);
+
+  return { alerts };
 }

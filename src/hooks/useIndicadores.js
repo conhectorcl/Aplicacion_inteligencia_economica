@@ -1,22 +1,28 @@
 import { useEffect, useState } from 'react';
-import { getIndicadores } from '../services/api/indicadoresService';
+import { getIndicadores, getIndicadoresResumen } from '../services/api/indicadoresService';
 
 export function useIndicadores() {
-  const [data, setData] = useState([]);
+  const [indicadores, setIndicadores] = useState([]);
+  const [resumen, setResumen] = useState({
+    ipc: 0,
+    tpm: 0,
+    usd: 0,
+    ipp: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      try {
-        const result = await getIndicadores();
-        setData(result);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      const data = await getIndicadores();
+      const resumenData = await getIndicadoresResumen();
+      setIndicadores(data);
+      setResumen(resumenData);
+      setLoading(false);
     }
 
     load();
   }, []);
 
-  return { data, loading };
+  return { indicadores, resumen, loading };
 }

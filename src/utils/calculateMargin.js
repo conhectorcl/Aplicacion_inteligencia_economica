@@ -1,4 +1,9 @@
-export function calculateMargin(precio, costo) {
-    if (!precio || precio === 0) return 0;
-    return (((precio - costo) / precio) * 100).toFixed(2);
-  }
+export function calculateMargin(price = 0, cost = 0) {
+  if (!price) return 0;
+  return ((price - cost) / price) * 100;
+}
+
+export function calculateSuggestedPrice(cost = 0, targetMargin = 0) {
+  if (targetMargin >= 100) return cost;
+  return cost / (1 - targetMargin / 100);
+}
