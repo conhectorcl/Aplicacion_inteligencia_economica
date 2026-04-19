@@ -1,21 +1,26 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useAppContext } from '../context/AppContext';
-import { useIndicadores } from '../hooks/useIndicadores';
-import { usePricing } from '../hooks/usePricing';
-import { useAlerts } from '../hooks/useAlerts';
-import { useReports } from '../hooks/useReports';
-import { formatCurrency } from '../utils/formatCurrency';
-import { formatPercent } from '../utils/formatPercent';
-import { getSeverityBadgeClass } from '../lib/helpers';
+import { useAuth } from '../src/context/AuthContext';
+import { useAppContext } from '../src/context/AppContext';
+import { useIndicadores } from '../src/hooks/useIndicadores';
+import { usePricing } from '../src/hooks/usePricing';
+import { useAlerts } from '../src/hooks/useAlerts';
+import { useReports } from '../src/hooks/useReports';
+import { formatCurrency } from '../src/utils/formatCurrency';
+import { formatPercent } from '../src/utils/formatPercent';
+import { getSeverityBadgeClass } from '../src/lib/helpers';
 
 export default function AppRouter() {
   const { user, logout } = useAuth();
   const { filters, setFilters } = useAppContext();
-  const { indicadores, resumen } = useIndicadores();
+
+  const { indicadores, resumen, loading: loadingIndicadores } = useIndicadores();
   const { pricingRows, selectedProductId, setSelectedProductId, selectedPricing } = usePricing(indicadores);
   const { alerts } = useAlerts(indicadores);
-  const { report, exportReport } = useReports(indicadores, alerts, pricingRows);
+  const { report, saveReport, exportReport } = useReports(indicadores, alerts, pricingRows);
+
+  if (loadingIndicadores) {
+    return <div className="app-shell"><div className="container">Cargando CLARUS...</div></div>;
+  }
 
   return (
     <div className="app-shell">
@@ -28,8 +33,8 @@ export default function AppRouter() {
 
           <div className="user-box">
             <div>
-              <div><strong>{user?.name}</strong></div>
-              <div className="small muted">{user?.role}</div>
+              <strong>{user?.full_name || user?.email}</strong>
+              <div className="small muted">{user?.company}</div>
             </div>
             <button className="btn secondary" onClick={logout}>
               Salir
@@ -39,12 +44,11 @@ export default function AppRouter() {
 
         <section className="hero">
           <div className="card hero-panel">
-            <span className="badge info">Escenario económico activo</span>
-            <h2>El costo del dinero sigue presionando precios y márgenes</h2>
+            <span className="badge info">MVP conectado a Supabase</span>
+            <h2>El entorno económico ya está entrando a la app desde la base de datos</h2>
             <p>
-              CLARUS cruza indicadores macroeconómicos con datos operativos de la empresa para
-              transformar señales del entorno en decisiones concretas de pricing, costos, riesgo y
-              monitoreo ejecutivo.
+              Este MVP cruza indicadores macroeconómicos, pricing sugerido, alertas ejecutivas
+              y reportería, con una arquitectura lista para evolucionar a producto comercial.
             </p>
 
             <div className="toolbar">
@@ -73,15 +77,15 @@ export default function AppRouter() {
           <div className="card">
             <h3>Resumen ejecutivo</h3>
             <div className="metric-row">
-              <span>IPC acumulado</span>
+              <span>IPC</span>
               <strong>{formatPercent(resumen.ipc)}</strong>
             </div>
             <div className="metric-row">
-              <span>TPM vigente</span>
+              <span>TPM</span>
               <strong>{formatPercent(resumen.tpm)}</strong>
             </div>
             <div className="metric-row">
-              <span>USD observado</span>
+              <span>USD</span>
               <strong>{formatCurrency(resumen.usd, 'USD')}</strong>
             </div>
             <div className="metric-row">
@@ -98,9 +102,7 @@ export default function AppRouter() {
               <div className="kpi-value">
                 {item.unidad === '%' ? formatPercent(item.valor) : formatCurrency(item.valor, item.moneda)}
               </div>
-              <div className="kpi-foot">
-                Variación mensual: {formatPercent(item.variacionMensual)}
-              </div>
+              <div className="kpi-foot">Variación mensual: {formatPercent(item.variacionMensual)}</div>
             </div>
           ))}
         </section>
@@ -109,7 +111,7 @@ export default function AppRouter() {
           <div className="card">
             <h3 className="section-title">Motor de pricing</h3>
             <p className="card-subtitle">
-              Recomendaciones de precios por producto según costos, margen objetivo e impacto macro.
+              Recomendación de precios basada en costos, margen objetivo e indicadores económicos.
             </p>
 
             <div className="toolbar">
@@ -147,9 +149,6 @@ export default function AppRouter() {
 
           <div className="card">
             <h3 className="section-title">Alertas inteligentes</h3>
-            <p className="card-subtitle">
-              Señales priorizadas para gerencia general, comercial y finanzas.
-            </p>
 
             {alerts.map((alert) => (
               <div className="alert-item" key={alert.id}>
@@ -164,7 +163,6 @@ export default function AppRouter() {
                     {alert.message}
                   </div>
                 </div>
-
                 <div className="small muted">{alert.area}</div>
               </div>
             ))}
@@ -192,9 +190,7 @@ export default function AppRouter() {
                       <td>{formatCurrency(row.precioActual)}</td>
                       <td>{formatCurrency(row.precioSugerido)}</td>
                       <td>{formatPercent(row.margenActual)}</td>
-                      <td className={row.ajusteRecomendado > 0 ? 'text-warning' : 'text-success'}>
-                        {formatPercent(row.ajusteRecomendado)}
-                      </td>
+                      <td>{formatPercent(row.ajusteRecomendado)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -204,30 +200,36 @@ export default function AppRouter() {
 
           <div className="card">
             <h3 className="section-title">Reporte ejecutivo</h3>
-            <p className="card-subtitle">
-              Síntesis automática del escenario y de las decisiones sugeridas.
-            </p>
 
-            <div className="metric-row">
-              <span>Título</span>
-              <strong>{report.title}</strong>
-            </div>
-            <div className="metric-row">
-              <span>Enfoque</span>
-              <strong>{report.focus}</strong>
-            </div>
-            <div className="metric-row">
-              <span>Recomendación principal</span>
-              <strong>{report.mainRecommendation}</strong>
-            </div>
-            <div className="metric-row">
-              <span>Prioridad</span>
-              <strong>{report.priority}</strong>
-            </div>
+            {report && (
+              <>
+                <div className="metric-row">
+                  <span>Título</span>
+                  <strong>{report.title}</strong>
+                </div>
+                <div className="metric-row">
+                  <span>Enfoque</span>
+                  <strong>{report.focus}</strong>
+                </div>
+                <div className="metric-row">
+                  <span>Prioridad</span>
+                  <strong>{report.priority}</strong>
+                </div>
+                <div className="metric-row">
+                  <span>Recomendación principal</span>
+                  <strong>{report.mainRecommendation}</strong>
+                </div>
 
-            <button className="btn" onClick={exportReport}>
-              Exportar reporte
-            </button>
+                <div className="toolbar">
+                  <button className="btn" onClick={saveReport}>
+                    Guardar reporte
+                  </button>
+                  <button className="btn secondary" onClick={exportReport}>
+                    Exportar reporte
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </section>
       </div>

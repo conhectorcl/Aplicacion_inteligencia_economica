@@ -1,41 +1,53 @@
+import { fetchAlertasActivas, callEdgeFunction, insertAlertas } from '../supabase/queries';
 import { mockAlerts } from '../../data/mockAlerts';
 
 export async function getAlerts(indicadores = []) {
-  const tpm = indicadores.find((i) => i.codigo === 'TPM')?.valor || 0;
-  const ipc = indicadores.find((i) => i.codigo === 'IPC')?.valor || 0;
-  const usd = indicadores.find((i) => i.codigo === 'USD')?.valor || 0;
+  const { data, error } = await fetchAlertasActivas();
 
-  const dynamicAlerts = [];
-
-  if (tpm >= 7) {
-    dynamicAlerts.push({
-      id: 'alt_tpm',
-      title: 'Financiamiento bajo presión',
-      message: 'La TPM se mantiene elevada. Revise líneas de crédito, capital de trabajo y condiciones de financiamiento.',
-      severity: 'warning',
-      area: 'Finanzas',
-    });
+  if (!error && data?.length) {
+    return {
+      data,
+      source: 'database',
+      error: null,
+    };
   }
 
-  if (ipc >= 4) {
-    dynamicAlerts.push({
-      id: 'alt_ipc',
-      title: 'Inflación con impacto en reposición',
-      message: 'Los costos de reposición podrían erosionar margen si no se ajustan precios y políticas comerciales.',
-      severity: 'warning',
-      area: 'Pricing',
-    });
+  const { data: edgeData, error: edgeError } = await callEdgeFunction('generar-alertas', {
+    indicadores,
+  });
+
+  if (!edgeError && edgeData?.data?.length) {
+    return {
+      data: edgeData.data,
+      source: 'edge-function',
+      error: null,
+    };
   }
 
-  if (usd >= 930) {
-    dynamicAlerts.push({
-      id: 'alt_usd',
-      title: 'Tipo de cambio relevante para importados',
-      message: 'Monitoree mix de productos importados y proveedores dolarizados.',
-      severity: 'danger',
-      area: 'Abastecimiento',
-    });
+  return {
+    data: mockAlerts,
+    source: 'mock',
+    error: error || edgeError || null,
+  };
+}
+
+export async function generateAndPersistAlerts(indicadores = []) {
+  const { data: edgeData, error } = await callEdgeFunction('generar-alertas', {
+    indicadores,
+  });
+
+  if (error || !edgeData?.data?.length) {
+    return { data: [], error: error || null };
   }
 
-  return Promise.resolve([...dynamicAlerts, ...mockAlerts]);
+  const rows = edgeData.data.map((item) => ({
+    title: item.title,
+    message: item.message,
+    severity: item.severity,
+    area: item.area,
+    is_active: true,
+  }));
+
+  const result = await insertAlertas(rows);
+  return result;
 }
