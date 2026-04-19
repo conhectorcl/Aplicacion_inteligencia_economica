@@ -1,16 +1,20 @@
 export const mockAlerts = [
   {
     id: 'alt_001',
-    title: 'Mayor presión en categorías importadas',
-    message: 'Los productos con insumos dolarizados muestran deterioro esperado de margen para las próximas 4 semanas.',
-    severity: 'info',
+    title: 'Presión en categorías importadas',
+    message: 'Los productos con insumos dolarizados presentan mayor riesgo de deterioro de margen.',
+    severity: 'warning',
     area: 'Abastecimiento',
+    is_active: true,
+    created_at: new Date().toISOString(),
   },
   {
     id: 'alt_002',
-    title: 'Ventana para ajuste selectivo de precios',
-    message: 'Se observa espacio para corregir precios en SKU de alta rotación sin comprometer demanda en exceso.',
+    title: 'Espacio para reajuste selectivo',
+    message: 'Hay margen para corregir precios en SKU de alta rotación.',
     severity: 'success',
-    area: 'Comercial',
+    area: 'Pricing',
+    is_active: true,
+    created_at: new Date().toISOString(),
   },
 ];

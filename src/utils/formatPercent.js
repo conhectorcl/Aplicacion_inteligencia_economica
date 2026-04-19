@@ -1,3 +1,3 @@
-export function formatPercent(value = 0) {
-  return `${Number(value).toFixed(2)}%`;
+export function formatPercent(value = 0, digits = 2) {
+  return `${Number(value || 0).toFixed(digits)}%`;
 }

@@ -10,6 +10,8 @@ export function AppProvider({ children }) {
   });
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
+  const [selectedProductId, setSelectedProductId] = useState('');
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null);
 
   const value = useMemo(
     () => ({
@@ -17,8 +19,12 @@ export function AppProvider({ children }) {
       setFilters,
       selectedDate,
       setSelectedDate,
+      selectedProductId,
+      setSelectedProductId,
+      selectedCompanyId,
+      setSelectedCompanyId,
     }),
-    [filters, selectedDate]
+    [filters, selectedDate, selectedProductId, selectedCompanyId]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

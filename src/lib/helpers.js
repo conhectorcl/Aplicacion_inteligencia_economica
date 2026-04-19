@@ -2,11 +2,6 @@ export function cn(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export function truncateText(text = '', length = 120) {
-  if (text.length <= length) return text;
-  return `${text.slice(0, length)}...`;
-}
-
 export function getSeverityBadgeClass(severity = 'info') {
   const map = {
     info: 'info',
@@ -18,6 +13,12 @@ export function getSeverityBadgeClass(severity = 'info') {
   return map[severity] || 'info';
 }
 
-export function generateId(prefix = 'id') {
-  return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
+export function safeNumber(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+export function truncateText(text = '', maxLength = 120) {
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
 }

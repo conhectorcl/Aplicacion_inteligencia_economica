@@ -1,7 +1,11 @@
 import { supabase } from './client';
 
 export async function signInWithPassword(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
   return { data, error };
 }
 
@@ -18,4 +22,8 @@ export async function getSession() {
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
   return { data, error };
+}
+
+export function onAuthStateChange(callback) {
+  return supabase.auth.onAuthStateChange(callback);
 }

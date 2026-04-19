@@ -1,39 +1,103 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  getCurrentUser,
+  getSession,
+  onAuthStateChange,
+  signInWithPassword,
+  signOut,
+} from '../services/supabase/auth';
 
 const AuthContext = createContext(null);
 
-const mockUser = {
-  id: 'usr_001',
-  name: 'Héctor Mario',
+const demoUser = {
+  id: 'demo-user',
   email: 'hector.mario@conhector.cl',
-  role: 'Director de Estrategia',
-  company: 'Conhéctor Consultores - Grupo Conhéctor SpA',
+  name: 'Demo CLARUS',
+  role: 'viewer',
+  company: 'Empresa Demo',
 };
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(mockUser);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [user, setUser] = useState(demoUser);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = async () => {
-    setUser(mockUser);
-    setIsAuthenticated(true);
-    return { success: true, user: mockUser };
-  };
+  useEffect(() => {
+    let mounted = true;
 
-  const logout = async () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    return { success: true };
-  };
+    async function loadSession() {
+      setLoading(true);
+
+      const { data: sessionData } = await getSession();
+      const { data: userData } = await getCurrentUser();
+
+      if (!mounted) return;
+
+      if (sessionData?.session && userData?.user) {
+        setSession(sessionData.session);
+        setUser({
+          id: userData.user.id,
+          email: userData.user.email,
+          name: userData.user.user_metadata?.name || userData.user.email,
+          role: userData.user.user_metadata?.role || 'user',
+          company: userData.user.user_metadata?.company || 'Cliente CLARUS',
+        });
+      } else {
+        setSession(null);
+        setUser(demoUser);
+      }
+
+      setLoading(false);
+    }
+
+    loadSession();
+
+    const { data: authListener } = onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+
+      if (newSession?.user) {
+        setUser({
+          id: newSession.user.id,
+          email: newSession.user.email,
+          name: newSession.user.user_metadata?.name || newSession.user.email,
+          role: newSession.user.user_metadata?.role || 'user',
+          company: newSession.user.user_metadata?.company || 'Cliente CLARUS',
+        });
+      } else {
+        setUser(demoUser);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      authListener?.subscription?.unsubscribe?.();
+    };
+  }, []);
+
+  async function login(email, password) {
+    const { data, error } = await signInWithPassword(email, password);
+    return { data, error };
+  }
+
+  async function logout() {
+    const { error } = await signOut();
+    if (!error) {
+      setUser(demoUser);
+      setSession(null);
+    }
+    return { error };
+  }
 
   const value = useMemo(
     () => ({
       user,
-      isAuthenticated,
+      session,
+      loading,
+      isAuthenticated: !!session?.user,
       login,
       logout,
     }),
-    [user, isAuthenticated]
+    [user, session, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

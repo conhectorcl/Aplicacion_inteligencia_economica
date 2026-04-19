@@ -5,5 +5,5 @@ export function formatCurrency(value = 0, currency = 'CLP') {
     style: 'currency',
     currency,
     maximumFractionDigits: 0,
-  }).format(value);
+  }).format(Number(value || 0));
 }
