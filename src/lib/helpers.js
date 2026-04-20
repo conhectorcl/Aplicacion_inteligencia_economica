@@ -22,3 +22,31 @@ export function truncateText(text = '', maxLength = 120) {
   if (text.length <= maxLength) return text;
   return `${text.slice(0, maxLength)}...`;
 }
+
+export function buildMacroSeries(indicadoresHistoricos = []) {
+  if (!Array.isArray(indicadoresHistoricos) || !indicadoresHistoricos.length) {
+    return [];
+  }
+
+  const grouped = {};
+
+  indicadoresHistoricos.forEach((item) => {
+    const fecha = new Date(item.fecha);
+    const mes = fecha.toLocaleDateString('es-CL', {
+      month: 'short',
+      year: '2-digit',
+    });
+
+    if (!grouped[mes]) {
+      grouped[mes] = { mes, ipc: null, tpm: null, usd: null };
+    }
+
+    const codigo = String(item.codigo || '').toUpperCase();
+
+    if (codigo === 'IPC') grouped[mes].ipc = Number(item.valor);
+    if (codigo === 'TPM') grouped[mes].tpm = Number(item.valor);
+    if (codigo === 'USD') grouped[mes].usd = Number(item.valor);
+  });
+
+  return Object.values(grouped);
+}

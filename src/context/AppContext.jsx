@@ -6,25 +6,45 @@ export function AppProvider({ children }) {
   const [filters, setFilters] = useState({
     vertical: 'retail',
     decisionFocus: 'pricing',
-    scenario: 'base',
+    dateRange: '30d',
   });
 
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
-  const [selectedProductId, setSelectedProductId] = useState('');
-  const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [selectedScenario, setSelectedScenario] = useState('base');
+
+  const [globalLoading, setGlobalLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Cargando...');
+
+  const showLoading = (message = 'Cargando...') => {
+    setLoadingMessage(message);
+    setGlobalLoading(true);
+  };
+
+  const hideLoading = () => {
+    setGlobalLoading(false);
+    setLoadingMessage('Cargando...');
+  };
 
   const value = useMemo(
     () => ({
       filters,
       setFilters,
-      selectedDate,
-      setSelectedDate,
       selectedProductId,
       setSelectedProductId,
-      selectedCompanyId,
-      setSelectedCompanyId,
+      selectedScenario,
+      setSelectedScenario,
+      globalLoading,
+      loadingMessage,
+      showLoading,
+      hideLoading,
     }),
-    [filters, selectedDate, selectedProductId, selectedCompanyId]
+    [
+      filters,
+      selectedProductId,
+      selectedScenario,
+      globalLoading,
+      loadingMessage,
+    ]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

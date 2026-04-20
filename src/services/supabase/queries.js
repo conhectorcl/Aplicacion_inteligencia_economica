@@ -68,3 +68,14 @@ export async function callEdgeFunction(name, body = {}) {
 
   return { data, error };
 }
+
+export async function fetchIndicadoresHistoricos() {
+  const { data, error } = await supabase
+    .from('indicadores_economicos')
+    .select('*')
+    .in('codigo', ['IPC', 'TPM', 'USD'])
+    .order('fecha', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}

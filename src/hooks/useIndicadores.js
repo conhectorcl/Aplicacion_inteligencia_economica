@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getIndicadores, getIndicadoresResumen } from '../services/api/indicadoresService';
+import { getIndicadores, getIndicadoresResumen, getMacroSeries } from '../services/api/indicadoresService';
+
 
 export function useIndicadores() {
   const [indicadores, setIndicadores] = useState([]);
@@ -12,13 +13,16 @@ export function useIndicadores() {
   const [source, setSource] = useState('loading');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [macroSeries, setMacroSeries] = useState([]);
 
   async function reload() {
     setLoading(true);
 
     const indicadoresResult = await getIndicadores();
     const resumenResult = await getIndicadoresResumen();
+    const series = await getMacroSeries();
 
+    setMacroSeries(series);
     setIndicadores(indicadoresResult.data || []);
     setResumen(resumenResult.data || {});
     setSource(indicadoresResult.source || 'unknown');
@@ -30,10 +34,19 @@ export function useIndicadores() {
     reload();
   }, []);
 
+  // return {
+  //   indicadores,
+  //   resumen,
+  //   source,
+  //   loading,
+  //   error,
+  //   reload,
+  // };
+
   return {
     indicadores,
     resumen,
-    source,
+    macroSeries,
     loading,
     error,
     reload,

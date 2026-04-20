@@ -1,6 +1,7 @@
-import { fetchLatestIndicadores, callEdgeFunction } from '../supabase/queries';
+import { fetchLatestIndicadores, callEdgeFunction, fetchIndicadoresHistoricos } from '../supabase/queries';
 import { mockMacroData } from '../../data/mockMacroData';
 import { buildIndicadoresResumen, parseIndicators } from '../../utils/parseIndicators';
+import { buildMacroSeries } from '../../lib/helpers';
 
 export async function getIndicadores() {
   const { data, error } = await fetchLatestIndicadores();
@@ -30,6 +31,16 @@ export async function getIndicadores() {
     source: 'mock',
     error: error || edgeError || null,
   };
+}
+
+export async function getMacroSeries() {
+  try {
+    const rows = await fetchIndicadoresHistoricos();
+    return buildMacroSeries(rows);
+  } catch (error) {
+    console.error('Error obteniendo serie histórica:', error.message);
+    return [];
+  }
 }
 
 export async function getIndicadoresResumen() {

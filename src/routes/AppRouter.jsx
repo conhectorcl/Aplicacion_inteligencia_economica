@@ -1,13 +1,18 @@
 import React from 'react';
-import { useAuth } from '../src/context/AuthContext';
-import { useAppContext } from '../src/context/AppContext';
-import { useIndicadores } from '../src/hooks/useIndicadores';
-import { usePricing } from '../src/hooks/usePricing';
-import { useAlerts } from '../src/hooks/useAlerts';
-import { useReports } from '../src/hooks/useReports';
-import { formatCurrency } from '../src/utils/formatCurrency';
-import { formatPercent } from '../src/utils/formatPercent';
-import { getSeverityBadgeClass } from '../src/lib/helpers';
+import { useAuth } from '../context/AuthContext';
+import { useAppContext } from '../context/AppContext';
+import { useIndicadores } from '../hooks/useIndicadores';
+import { usePricing } from '../hooks/usePricing';
+import { useAlerts } from '../hooks/useAlerts';
+import { useReports } from '../hooks/useReports';
+import { formatCurrency } from '../utils/formatCurrency';
+import { formatPercent } from '../utils/formatPercent';
+import { getSeverityBadgeClass } from '../lib/helpers';
+import AlertsPanel from '../components/dashboard/AlertsPanel';
+import MacroTrendChart from '../components/dashboard/MacroTrendChart';
+import { mockMacroSeries } from '../data/mockMacroSeries';
+
+
 
 export default function AppRouter() {
   const { user, logout } = useAuth();
@@ -15,12 +20,16 @@ export default function AppRouter() {
 
   const { indicadores, resumen, loading: loadingIndicadores } = useIndicadores();
   const { pricingRows, selectedProductId, setSelectedProductId, selectedPricing } = usePricing(indicadores);
-  const { alerts } = useAlerts(indicadores);
+  // const { alerts } = useAlerts(indicadores);
+  const { alerts, loading: loadingAlerts, reload: reloadAlerts } = useAlerts(indicadores);
   const { report, saveReport, exportReport } = useReports(indicadores, alerts, pricingRows);
+  
+  <MacroTrendChart data={mockMacroSeries} />
 
   if (loadingIndicadores) {
     return <div className="app-shell"><div className="container">Cargando CLARUS...</div></div>;
   }
+
 
   return (
     <div className="app-shell">
@@ -44,11 +53,10 @@ export default function AppRouter() {
 
         <section className="hero">
           <div className="card hero-panel">
-            <span className="badge info">MVP conectado a Supabase</span>
-            <h2>El entorno económico ya está entrando a la app desde la base de datos</h2>
+            {/* <span className="badge info">MVP conectado a Supabase</span> */}
+            <h2>Inteligencia económica para decisiones empresariales</h2> 
             <p>
-              Este MVP cruza indicadores macroeconómicos, pricing sugerido, alertas ejecutivas
-              y reportería, con una arquitectura lista para evolucionar a producto comercial.
+                Interfaz para traducir IPC, TPM, dólar, costos y demanda en decisiones concretas de precio, margen y financiamiento.
             </p>
 
             <div className="toolbar">
@@ -106,6 +114,31 @@ export default function AppRouter() {
             </div>
           ))}
         </section>
+
+        <section className="grid grid-2" style={{ marginBottom: '16px' }}>
+          <MacroTrendChart data={mockMacroSeries} />
+          
+          <div className="card">
+            <h3 className="section-title">Resumen de entorno</h3>
+            <p className="card-subtitle">
+              Lectura rápida del comportamiento reciente de las variables económicas clave.
+            </p>
+
+            <div className="metric-row">
+              <span>IPC</span>
+              <strong>{formatPercent(resumen.ipc)}</strong>
+            </div>
+            <div className="metric-row">
+              <span>TPM</span>
+              <strong>{formatPercent(resumen.tpm)}</strong>
+            </div>
+            <div className="metric-row">
+              <span>USD</span>
+              <strong>{formatCurrency(resumen.usd, 'USD')}</strong>
+            </div>
+          </div>
+        </section>
+
 
         <section className="grid grid-2" style={{ marginBottom: '16px' }}>
           <div className="card">
